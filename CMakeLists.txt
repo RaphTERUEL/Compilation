@@ -3,4 +3,4 @@ project(Compilation C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(Compilation main.c)
+add_executable(Compilation automate.c)
