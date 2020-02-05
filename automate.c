@@ -66,26 +66,25 @@ Enslist * ajouter_Trans(Enslist * e,char car,int voisin);
 int vExiste(List * l, int* e, int nb);
 Enslist * Derniermayon(List * list);
 automate * Determinisation(automate * a);
+int charintab(char*car,char c,int nb);
+char *transitiondiferent(automate* a, char *car);
+int trensitionexiste(vertex*v, char c);
+bool tableauegale(int * a, int * b,int nb);
+automate * minimisation(automate *a);
+int nbtrensition(automate* a,char *car);
 
 int main(int nbarg, char *args[])
 {
 
 	automate * a=caracter("a");
 	automate * b=caracter("b");
-	automate * aa=kleen(a);
-	affichage(*aa);
-    automate * c=concatenation(aa,b);
-    affichage(*c);
-    automate * d=concatenation(b,aa);
-    d->Vertex[1].accepteur=TRUE;
+
+	automate * d=reuninon(a,b);
     affichage(*d);
-    c=reuninon(c,d);
-
-    affichage(*c);
-
-    c=Determinisation(c);
-
-    affichage(*c);
+    d=kleen(d);
+    affichage(*d);
+    a=minimisation(d);
+    affichage(*a);
 	return 0;
 }
 
@@ -431,3 +430,173 @@ Enslist * ajouter_Trans(Enslist * e,char car,int voisin){
     e->nb_T++;
     return e;
 }
+
+
+
+automate * minimisation(automate *a){
+
+    int * init=(int*)malloc((a->nbr_etats+1)* sizeof(int));
+    int * final=(int*)malloc((a->nbr_etats+1)* sizeof(int));
+    int nbtransition=0;
+    char * transition=(char *)malloc(sizeof(char));
+    int indicetrensition=0;
+    int nb=0;
+    int indice=0;
+    for (int i = 0; i <a->nbr_etats ; ++i) {
+        if( a->Vertex[i].accepteur==TRUE)
+            final[i]=1;
+        else
+            final[i]=0;
+
+    }
+    final[a->nbr_etats]=0;
+
+    transition=transitiondiferent(a,transition);
+    nbtransition=nbtrensition(a,transition);
+    int ** tab = (int**)malloc(nbtransition* sizeof(int*));
+    for (int j = 0; j <nbtransition ; ++j) {
+        tab[j]=(int*)malloc(a->nbr_etats+1* sizeof(int ));
+    }
+
+
+    do{
+        for (int k = 0; k <a->nbr_etats+1 ; ++k) {
+            init[k]=final[k];
+        }
+
+        for (int i = 0; i < a->nbr_etats; ++i) {
+            for (int j = 0; j < nbtransition; ++j) {
+                indicetrensition=trensitionexiste(&a->Vertex[i],transition[j]);
+                if(indicetrensition==-1){
+                    tab[j][i]=init[a->nbr_etats];
+                }
+                else{
+                    tab[j][i]=init[indicetrensition];
+                }
+
+            }
+        }
+        for (int j = 0; j < nbtransition; ++j) {
+
+                tab[j][a->nbr_etats]=init[a->nbr_etats];
+
+
+        }
+
+        for (int m = 0; m <a->nbr_etats; ++m) {
+            final[m]=-1;
+        }
+        final[0]=0;
+        nb=0;
+
+        for (int l = 1; l < a->nbr_etats ; ++l) {
+            for (int i = 0; i <l ; ++i) {
+                indice=0;
+                while(tab[indice][l]==tab[indice][i] && indice<nbtransition-1){
+                    indice++;
+                }
+                if(tab[indice][l]==tab[indice][i] && indice==nbtransition-1){
+                    final[l]=final[i];
+                    break;
+                }
+
+            }
+            if(final[l]==-1){
+                nb++;
+                final[l]=nb;
+            }
+
+        }
+
+        nb++;
+        final[a->nbr_etats]=nb;
+
+    }while(!tableauegale(init,final,a->nbr_etats+1));
+
+    automate * new=malloc(sizeof(automate));
+    new->Vertex=(vertex*)malloc(nb * sizeof(vertex));
+    new->nbr_etats=nb;
+    indice=0;
+    for (int i = 0; indice <nb ; ++i) {
+        if(i==indice) {
+
+            for (int j = 0; j <nbtransition; ++j) {
+                if(tab[j][i]!=nb){
+                    new->Vertex[indice].numSommet=indice;
+                    new->Vertex[indice].accepteur=a->Vertex[i].accepteur;
+                    addEdge(&new->Vertex[indice],&new->Vertex[tab[j][i]],transition[j]);
+                }
+            }
+            indice++;
+        }
+    }
+
+
+
+    return new;
+
+}
+
+bool tableauegale(int * a, int * b,int nb){
+    for (int i = 0; i <nb ; ++i) {
+        if( a[i]!=b[i]){
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+
+int trensitionexiste(vertex*v, char c){
+    for (int i = 0; i <v->nb_edge ; ++i) {
+        if(v->tab_edge[i].word==c)
+            return i;
+    }
+    return -1;
+}
+
+char *transitiondiferent(automate* a, char *car){
+    int nb=a->Vertex[0].nb_edge;
+    car=malloc(a->Vertex[0].nb_edge*sizeof(char));
+    for (int j = 0; j <a->Vertex[0].nb_edge ; ++j) {
+        car[j]=a->Vertex[0].tab_edge[j].word;
+    }
+    for (int i = 1; i <a->nbr_etats ; ++i) {
+        for (int j = 0; j <a->Vertex[i].nb_edge ; ++j) {
+            if(charintab(car,a->Vertex[i].tab_edge[j].word,nb)==-1){
+                nb++;
+                car=realloc(car,nb* sizeof(char));
+                car[nb-1]=a->Vertex[i].tab_edge[j].word;
+            }
+        }
+
+    }
+
+
+    return car;
+}
+int nbtrensition(automate* a,char *car){
+    int nb=0;
+    for (int i = 0; i <a->nbr_etats ; ++i) {
+        for (int j = 0; j <a->Vertex[i].nb_edge ; ++j) {
+            if(charintab(car,a->Vertex[i].tab_edge[j].word,nb)==-1){
+                nb++;
+
+            }
+        }
+
+    }
+
+
+    return nb;
+}
+
+int charintab(char*car,char c,int nb){
+    for (int i = 0; i <nb ; ++i) {
+        if(car[i]==c)
+            return i;
+
+    }
+    return -1;
+}
+
