@@ -3,8 +3,8 @@
 int main(int nbarg, char *args[])
 {
 
-	automate * a=caracter("a");
-	automate * b=caracter("b");
+	automate * a=caracter('a');
+	automate * b=caracter('b');
 
 	automate * d=reuninon(a,b);
     affichage(*d);
@@ -82,7 +82,7 @@ automate * langagevide(void){
 
 //renvoie un automate standard reconnaissant le langage composé
 //d’un mot d’un caractère passé en paramètre
-automate* caracter(char * c)
+automate* caracter(char c)
 {
 
     automate * new=malloc(sizeof(automate));
@@ -101,7 +101,7 @@ automate* caracter(char * c)
     new->Vertex[1].numSommet = 1;
     new->Vertex[1].tab_edge = NULL;
 
-    addEdge(&new->Vertex[0],&new->Vertex[1],c[0]);
+    addEdge(&new->Vertex[0],&new->Vertex[1],c);
 
 
 

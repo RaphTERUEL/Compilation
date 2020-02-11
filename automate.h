@@ -1,5 +1,6 @@
 #ifndef AUTOMATE_H
 #define AUTOMATE_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +10,9 @@ typedef enum {FALSE, TRUE}bool;
 typedef struct vertex vertex;
 typedef struct edge edge;
 typedef struct automate automate;
+typedef struct Enslist Enslist;
+typedef struct Trans Trans;
+typedef struct List List;
 
 struct edge{
 	vertex *nextVertex;
@@ -30,28 +34,28 @@ struct automate{
 
 
 
-typedef struct Trans
+struct Trans
 {
     int *sommet;
     int size;
     char carra;
-    struct Trans *next;
-}Trans;
+    Trans *next;
+};
 
-typedef struct Enslist
+struct Enslist
 {
     int *sommet;
     int size;
-    struct Enslist *next;
+    Enslist *next;
     Trans * First;
     int nb_T;
-}Enslist;
+};
 
-typedef struct
+struct List
 {
     Enslist *first;
     int nb;
-}List;
+};
 
 
 
@@ -62,7 +66,7 @@ void addEdge(vertex *a,vertex * b, char carac) ;
 void affichage(automate autoFiniNonDeter);
 automate* motVide();
 automate * langagevide(void);
-automate* caracter(char *c);
+automate* caracter(char c);
 automate * kleen(automate * a);
 Enslist * ajouter_Trans(Enslist * e,char car,int voisin);
 int vExiste(List * l, int* e, int nb);
