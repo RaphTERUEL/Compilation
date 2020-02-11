@@ -9,9 +9,11 @@ int main(int nbarg, char *args[])
 	automate * d=reuninon(a,b);
     affichage(*d);
     d=kleen(d);
+    d=Determinisation(d);
     affichage(*d);
     a=minimisation(d);
     affichage(*a);
+    executionautomate(a,"aabaab");
 	return 0;
 }
 
@@ -364,7 +366,7 @@ automate * minimisation(automate *a){
 
     int * init=(int*)malloc((a->nbr_etats+1)* sizeof(int));
     int * final=(int*)malloc((a->nbr_etats+1)* sizeof(int));
-    int nbtransition=0;
+    int nbtransi=0;
     char * transition=(char *)malloc(sizeof(char));
     int indicetrensition=0;
     int nb=0;
@@ -379,9 +381,9 @@ automate * minimisation(automate *a){
     final[a->nbr_etats]=0;
 
     transition=transitiondiferent(a,transition);
-    nbtransition=nbtrensition(a,transition);
-    int ** tab = (int**)malloc(nbtransition* sizeof(int*));
-    for (int j = 0; j <nbtransition ; ++j) {
+    nbtransi= nbtransition(a, transition);
+    int ** tab = (int**)malloc(nbtransi* sizeof(int*));
+    for (int j = 0; j <nbtransi ; ++j) {
         tab[j]=(int*)malloc(a->nbr_etats+1* sizeof(int ));
     }
 
@@ -392,8 +394,8 @@ automate * minimisation(automate *a){
         }
 
         for (int i = 0; i < a->nbr_etats; ++i) {
-            for (int j = 0; j < nbtransition; ++j) {
-                indicetrensition=trensitionexiste(&a->Vertex[i],transition[j]);
+            for (int j = 0; j < nbtransi; ++j) {
+                indicetrensition= transitionexiste(&a->Vertex[i], transition[j]);
                 if(indicetrensition==-1){
                     tab[j][i]=init[a->nbr_etats];
                 }
@@ -403,7 +405,7 @@ automate * minimisation(automate *a){
 
             }
         }
-        for (int j = 0; j < nbtransition; ++j) {
+        for (int j = 0; j < nbtransi; ++j) {
 
                 tab[j][a->nbr_etats]=init[a->nbr_etats];
 
@@ -419,10 +421,10 @@ automate * minimisation(automate *a){
         for (int l = 1; l < a->nbr_etats ; ++l) {
             for (int i = 0; i <l ; ++i) {
                 indice=0;
-                while(tab[indice][l]==tab[indice][i] && indice<nbtransition-1){
+                while(tab[indice][l]==tab[indice][i] && indice<nbtransi-1){
                     indice++;
                 }
-                if(tab[indice][l]==tab[indice][i] && indice==nbtransition-1){
+                if(tab[indice][l]==tab[indice][i] && indice==nbtransi-1){
                     final[l]=final[i];
                     break;
                 }
@@ -447,7 +449,7 @@ automate * minimisation(automate *a){
     for (int i = 0; indice <nb ; ++i) {
         if(i==indice) {
 
-            for (int j = 0; j <nbtransition; ++j) {
+            for (int j = 0; j <nbtransi; ++j) {
                 if(tab[j][i]!=nb){
                     new->Vertex[indice].numSommet=indice;
                     new->Vertex[indice].accepteur=a->Vertex[i].accepteur;
@@ -474,7 +476,7 @@ bool tableauegale(int * a, int * b,int nb){
 }
 
 
-int trensitionexiste(vertex*v, char c){
+int transitionexiste(vertex *v, char c){
     for (int i = 0; i <v->nb_edge ; ++i) {
         if(v->tab_edge[i].word==c)
             return i;
@@ -502,7 +504,7 @@ char *transitiondiferent(automate* a, char *car){
 
     return car;
 }
-int nbtrensition(automate* a,char *car){
+int nbtransition(automate *a, char *car){
     int nb=0;
     for (int i = 0; i <a->nbr_etats ; ++i) {
         for (int j = 0; j <a->Vertex[i].nb_edge ; ++j) {
@@ -527,3 +529,29 @@ int charintab(char*car,char c,int nb){
     return -1;
 }
 
+
+void executionautomate(automate * a, char * mots)
+{
+    int i=0,existe=-1;
+    vertex * courant=&a->Vertex[0];
+    printf("%d ",courant->numSommet);
+    while(mots[i]!='\0'){
+
+        existe=transitionexiste(courant,mots[i]);
+        if(existe!=-1){
+            printf("--> %c --> %d ",courant->tab_edge[existe].word,courant->tab_edge[existe].nextVertex->numSommet);
+        } else{
+            break;
+        }
+        courant=courant->tab_edge[existe].nextVertex;
+        i++;
+    }
+    if(existe==-1){
+        printf("\ncette automate de ne verifie pas le mots");
+    } else if(courant->accepteur==TRUE){
+        printf("\nExecution terminer avec succès");
+    } else if(courant->accepteur==FALSE){
+        printf("\nLa dernier letre du mots ne se situe pas sur un etat accepteur");
+    }
+
+}

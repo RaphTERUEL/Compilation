@@ -74,9 +74,11 @@ Enslist * Derniermayon(List * list);
 automate * Determinisation(automate * a);
 int charintab(char*car,char c,int nb);
 char *transitiondiferent(automate* a, char *car);
-int trensitionexiste(vertex*v, char c);
+int transitionexiste(vertex *v, char c);
 bool tableauegale(int * a, int * b,int nb);
 automate * minimisation(automate *a);
-int nbtrensition(automate* a,char *car);
+int nbtransition(automate *a, char *car);
+void executionautomate(automate * a, char * mots);
+
 
 #endif
