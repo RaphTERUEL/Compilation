@@ -1,5 +1,5 @@
 #include "automate.h"
-
+#include <time.h>
 int main(int nbarg, char *args[])
 {
 
@@ -7,8 +7,9 @@ int main(int nbarg, char *args[])
 	automate * b=caracter('b');
 
 	automate * d=reuninon(a,b);
-    affichage(*d);
-    d=kleen(d);
+    d=concatenation(d,a);
+    d=concatenation(d,b);
+
     d=Determinisation(d);
     affichage(*d);
     a=minimisation(d);
@@ -20,12 +21,16 @@ int main(int nbarg, char *args[])
 void addEdge(vertex *a,vertex * b, char carac) {
 
 	edge  E;
-
+    edge * p;
 	a->nb_edge++;
-
 	E.nextVertex=b;
 	E.word=carac;
-    a->tab_edge=(edge*)realloc(a->tab_edge,sizeof(edge)*a->nb_edge);
+    p=(edge*)realloc(a->tab_edge,sizeof(edge)*a->nb_edge);
+    if(!p){
+        printf("salut");
+    } else{
+        a->tab_edge=p;
+    }
     a->tab_edge[a->nb_edge-1]=E;
 
 }
@@ -384,7 +389,7 @@ automate * minimisation(automate *a){
     nbtransi= nbtransition(a, transition);
     int ** tab = (int**)malloc(nbtransi* sizeof(int*));
     for (int j = 0; j <nbtransi ; ++j) {
-        tab[j]=(int*)malloc(a->nbr_etats+1* sizeof(int ));
+        tab[j]=(int*)malloc((a->nbr_etats+1)* sizeof(int ));
     }
 
 
@@ -398,9 +403,11 @@ automate * minimisation(automate *a){
                 indicetrensition= transitionexiste(&a->Vertex[i], transition[j]);
                 if(indicetrensition==-1){
                     tab[j][i]=init[a->nbr_etats];
+
                 }
                 else{
-                    tab[j][i]=init[indicetrensition];
+                    tab[j][i]=init[a->Vertex[i].tab_edge[indicetrensition].nextVertex->numSommet];
+
                 }
 
             }
@@ -439,20 +446,44 @@ automate * minimisation(automate *a){
 
         nb++;
         final[a->nbr_etats]=nb;
+        printf("  \t");
+        for (int i = 0; i < a->nbr_etats+1; ++i) {
 
+            printf(" %d ",init[i]);
+        }
+        printf("\n");
+        for (int n = 0; n <nbtransi ; ++n) {
+            printf("%c \t",transition[n]);
+            for (int i = 0; i < a->nbr_etats+1; ++i) {
+
+                printf(" %d ",tab[n][i]);
+            }
+            printf("\n");
+        }
+        printf("  \t");
+        for (int i = 0; i < a->nbr_etats+1; ++i) {
+
+            printf(" %d ",final[i]);
+        }
+        printf("\n\n");
     }while(!tableauegale(init,final,a->nbr_etats+1));
+
+
 
     automate * new=malloc(sizeof(automate));
     new->Vertex=(vertex*)malloc(nb * sizeof(vertex));
     new->nbr_etats=nb;
     indice=0;
-    for (int i = 0; indice <nb ; ++i) {
-        if(i==indice) {
+    for (int i = 0; indice <nb ; i++) {
 
-            for (int j = 0; j <nbtransi; ++j) {
+
+        if(final[i]==indice) {
+
+            new->Vertex[indice].numSommet=indice;
+            new->Vertex[indice].nb_edge=0;
+            new->Vertex[indice].accepteur=a->Vertex[i].accepteur;
+            for (int j = 0; j <nbtransi; j++) {
                 if(tab[j][i]!=nb){
-                    new->Vertex[indice].numSommet=indice;
-                    new->Vertex[indice].accepteur=a->Vertex[i].accepteur;
                     addEdge(&new->Vertex[indice],&new->Vertex[tab[j][i]],transition[j]);
                 }
             }
