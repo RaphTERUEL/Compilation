@@ -419,23 +419,26 @@ automate * minimisation(automate *a){
 
         }
 
-        for (int m = 0; m <a->nbr_etats; ++m) {
+        for (int m = 1; m <a->nbr_etats+1; ++m) {
             final[m]=-1;
         }
         final[0]=0;
         nb=0;
 
-        for (int l = 1; l < a->nbr_etats ; ++l) {
-            for (int i = 0; i <l ; ++i) {
-                indice=0;
-                while(tab[indice][l]==tab[indice][i] && indice<nbtransi-1){
-                    indice++;
-                }
-                if(tab[indice][l]==tab[indice][i] && indice==nbtransi-1){
-                    final[l]=final[i];
-                    break;
-                }
+        for (int l = 1; l < a->nbr_etats+1 ; l++) {
 
+            for (int i = 0; i <l ; i++) {
+
+                if(init[i]==init[l]) {
+                    indice=0;
+                    while (tab[indice][l] == tab[indice][i] && indice < nbtransi - 1) {
+                        indice++;
+                    }
+                    if (tab[indice][l] == tab[indice][i] && indice == nbtransi - 1) {
+                        final[l] = final[i];
+                        break;
+                    }
+                }
             }
             if(final[l]==-1){
                 nb++;
@@ -444,28 +447,8 @@ automate * minimisation(automate *a){
 
         }
 
-        nb++;
-        final[a->nbr_etats]=nb;
-        printf("  \t");
-        for (int i = 0; i < a->nbr_etats+1; ++i) {
 
-            printf(" %d ",init[i]);
-        }
-        printf("\n");
-        for (int n = 0; n <nbtransi ; ++n) {
-            printf("%c \t",transition[n]);
-            for (int i = 0; i < a->nbr_etats+1; ++i) {
 
-                printf(" %d ",tab[n][i]);
-            }
-            printf("\n");
-        }
-        printf("  \t");
-        for (int i = 0; i < a->nbr_etats+1; ++i) {
-
-            printf(" %d ",final[i]);
-        }
-        printf("\n\n");
     }while(!tableauegale(init,final,a->nbr_etats+1));
 
 
