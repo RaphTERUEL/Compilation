@@ -4,7 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// Permet de faire le type booléen
 typedef enum {FALSE, TRUE}bool;
+// Permet d'afficher des couleurs sur le terminal
 #define couleur(param) printf("\033[%sm",param)
 
 typedef struct vertex vertex;
@@ -70,10 +73,10 @@ automate* caracter(char c);
 automate * kleen(automate * a);
 Enslist * ajouter_Trans(Enslist * e,char car,int voisin);
 int vExiste(List * l, int* e, int nb);
-Enslist * Derniermayon(List * list);
+Enslist * Derniermaillon(List * list);
 automate * Determinisation(automate * a);
 int charintab(char*car,char c,int nb);
-char *transitiondiferent(automate* a, char *car);
+char *transitiondifferente(automate* a, char *car);
 int transitionexiste(vertex *v, char c);
 bool tableauegale(int * a, int * b,int nb);
 automate * minimisation(automate *a);

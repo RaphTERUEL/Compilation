@@ -1,0 +1,6 @@
+Pour compiler :
+make
+Pour executer :
+./automate
+Pour nettoyer :
+make clean

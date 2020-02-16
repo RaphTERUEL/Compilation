@@ -18,6 +18,10 @@ int main(int nbarg, char *args[])
 	return 0;
 }
 
+/* Fonction qui nous permet d'ajouter les transitions à notre automate
+ * Prend en entrée les deux sommets sur lesquels on veut ajouter l'arête
+ * Prend également le caractère que va représenter l'arête
+*/
 void addEdge(vertex *a,vertex * b, char carac) {
 
 	edge  E;
@@ -36,6 +40,7 @@ void addEdge(vertex *a,vertex * b, char carac) {
 }
 
 
+// Cette fonction nous permet d'afficher notre automate
 void affichage(automate a){
 
     int i;
@@ -64,7 +69,7 @@ void affichage(automate a){
 
 }
 
-
+// Cette fonction reconnait le mot vide
 automate* motVide()
 {
     automate * autoFiniNonDeter=malloc(sizeof(automate));
@@ -76,6 +81,7 @@ automate* motVide()
     return autoFiniNonDeter;
 }
 
+// Cette fonction reconnait le langage vide
 automate * langagevide(void){
     automate * new=malloc(sizeof(automate));
     new->nbr_etats=1;
@@ -87,8 +93,10 @@ automate * langagevide(void){
 }
 
 
-//renvoie un automate standard reconnaissant le langage composé
-//d’un mot d’un caractère passé en paramètre
+/* Renvoie un automate standard reconnaissant le langage composé
+ * Prend en entrée un caractère
+ * Renvoie un automate
+*/
 automate* caracter(char c)
 {
 
@@ -115,6 +123,10 @@ automate* caracter(char c)
     return new;
 }
 
+/* Permet de faire la réunion de deux automates
+ * Prend en entrée les deux automates à réunir
+ * Renvoie un automate qui est la réunion des deux en entrée
+*/
 automate * reuninon(automate * a, automate * b){
     int decalage=0;
 
@@ -156,6 +168,7 @@ automate * reuninon(automate * a, automate * b){
 
 }
 
+// Retourne le nombre d'état accepteur d'un automate
 int nbaccepteur(automate * a){
     int count=0;
     for (int i = 0; i <a->nbr_etats ; ++i) {
@@ -166,6 +179,10 @@ int nbaccepteur(automate * a){
     return count;
 }
 
+/* Permet de faire la concaténation de deux automates
+ * Prend en entrée les deux automates
+ * Renvoie l'automate concaténé
+*/
 automate * concatenation(automate * a, automate * b){
     int decalage=0;
 
@@ -211,7 +228,10 @@ automate * concatenation(automate * a, automate * b){
 }
 
 
-
+/* Permet d'executer la méthode de kleen, soit la mise à l'étoile
+ * Prend en entrée l'automte
+ * Retourne l'automate mis à l'étoile
+*/
 automate * kleen(automate * a){
     a->Vertex[0].accepteur=TRUE;
     for (int  i= 1; i <a->nbr_etats ; i++) {
@@ -226,7 +246,10 @@ automate * kleen(automate * a){
     return a;
 }
 
-
+/* Permet de déterminiser un automate
+ * Prend en entrée l'automate à déterminiser
+ * Renvoie l'automate déterminisé
+*/
 automate * Determinisation(automate * a){
     List * list=malloc(sizeof(List));
     list->nb=1;
@@ -260,7 +283,7 @@ automate * Determinisation(automate * a){
                e1->next=NULL;
                e1->First=NULL;
                e1->nb_T=0;
-               Derniermayon(list)->next=e1;
+               Derniermaillon(list)->next=e1;
                list->nb++;
             }
             t=t->next;
@@ -296,7 +319,8 @@ automate * Determinisation(automate * a){
     return new;
 }
 
-Enslist * Derniermayon(List * list){
+// Permet de retourner le dernier maillon d'une liste
+Enslist * Derniermaillon(List * list){
     Enslist * e=list->first;
     while(e->next!=NULL){
         e=e->next;
@@ -305,7 +329,10 @@ Enslist * Derniermayon(List * list){
 }
 
 
-
+/* Permet de déterminer si un sommet appartient à une liste
+ * Prend en entrée une liste, un tableau et un nombre
+ * Renvoie le numéro du sommet si il existe sinon renvoie -1
+*/
 int vExiste(List * l, int* e, int nb){
     Enslist  * p;
 
@@ -327,7 +354,11 @@ int vExiste(List * l, int* e, int nb){
     return -1;
 }
 
-
+/* Permet d'ajouter une transition à notre liste si elle n'existe pas
+ * sinon ajoute l'état cible dans le tableau des sommets
+ * Prend en entrée un type Enslist*, un caractère et un sommet voisin
+ * Renvoie un type Enslist*
+*/
 Enslist * ajouter_Trans(Enslist * e,char car,int voisin){
     Trans * t=malloc(sizeof(Trans));
     Trans * t1=malloc(sizeof(Trans));
@@ -366,7 +397,10 @@ Enslist * ajouter_Trans(Enslist * e,char car,int voisin){
 }
 
 
-
+/* Permet de minimiser un automate
+ * Prend en entrée l'automate à minimiser
+ * Renvoie l'automate minimisé
+*/
 automate * minimisation(automate *a){
 
     int * init=(int*)malloc((a->nbr_etats+1)* sizeof(int));
@@ -385,7 +419,7 @@ automate * minimisation(automate *a){
     }
     final[a->nbr_etats]=0;
 
-    transition=transitiondiferent(a,transition);
+    transition=transitiondifferente(a,transition);
     nbtransi= nbtransition(a, transition);
     int ** tab = (int**)malloc(nbtransi* sizeof(int*));
     for (int j = 0; j <nbtransi ; ++j) {
@@ -480,6 +514,7 @@ automate * minimisation(automate *a){
 
 }
 
+// Permet de savoir si deux tableaux sont égaux
 bool tableauegale(int * a, int * b,int nb){
     for (int i = 0; i <nb ; ++i) {
         if( a[i]!=b[i]){
@@ -489,7 +524,7 @@ bool tableauegale(int * a, int * b,int nb){
     return TRUE;
 }
 
-
+// Permet de savoir si une transition existe
 int transitionexiste(vertex *v, char c){
     for (int i = 0; i <v->nb_edge ; ++i) {
         if(v->tab_edge[i].word==c)
@@ -498,7 +533,11 @@ int transitionexiste(vertex *v, char c){
     return -1;
 }
 
-char *transitiondiferent(automate* a, char *car){
+/* Permet de savoir toute les différentes transitions présentent dans un automate
+ * Prend en entrée un automate et un tableau de caractère
+ * Renvoie un tableau de caractère
+*/
+char *transitiondifferente(automate* a, char *car){
     int nb=a->Vertex[0].nb_edge;
     car=malloc(a->Vertex[0].nb_edge*sizeof(char));
     for (int j = 0; j <a->Vertex[0].nb_edge ; ++j) {
@@ -518,6 +557,8 @@ char *transitiondiferent(automate* a, char *car){
 
     return car;
 }
+
+// Permet de réécupérer le nombre de transition différente dans un automate
 int nbtransition(automate *a, char *car){
     int nb=0;
     for (int i = 0; i <a->nbr_etats ; ++i) {
@@ -534,6 +575,7 @@ int nbtransition(automate *a, char *car){
     return nb;
 }
 
+// Permet de savoir si un carctère est présent dans un tableau
 int charintab(char*car,char c,int nb){
     for (int i = 0; i <nb ; ++i) {
         if(car[i]==c)
@@ -543,7 +585,9 @@ int charintab(char*car,char c,int nb){
     return -1;
 }
 
-
+/* Permet de savoir si un automate reconnait une chaine de carctère
+ * Prend en entrée un automate et une chaîne de carctère
+*/
 void executionautomate(automate * a, char * mots)
 {
     int i=0,existe=-1;
@@ -561,11 +605,11 @@ void executionautomate(automate * a, char * mots)
         i++;
     }
     if(existe==-1){
-        printf("\ncette automate de ne verifie pas le mots");
+        printf("\ncet automate ne verifie pas le mot\n");
     } else if(courant->accepteur==TRUE){
-        printf("\nExecution terminer avec succès");
+        printf("\nExecution terminé avec succès\n");
     } else if(courant->accepteur==FALSE){
-        printf("\nLa dernier letre du mots ne se situe pas sur un etat accepteur");
+        printf("\nLa dernière lettre du mot ne se situe pas sur un état accepteur\n");
     }
 
 }
